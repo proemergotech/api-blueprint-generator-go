@@ -15,15 +15,18 @@ This project is in development stage. It is mainly used for private purposes, me
 
 ## Usage
 
-`api-blueprint-generator-go [source .go file] [destionation API.md file]`
+`api-blueprint-generator-go [source .go files glob] [destionation API.md file]`
 
 Note that you can safely extend and regenerate your API.md file, as only content between the placeholders
 ``` ###### `# Generated docs start` ``` and ``` ###### `# Generated docs end` ``` will be replaced.
 
 ## Example
 
-### Source file
+`api-blueprint-generator-go example/dummy*.go example/API.md`
 
+### Source files
+
+#### dummy_one.go
 ```go
 package example
 
@@ -43,6 +46,21 @@ type Included struct {
 
 type Nested struct {
 	OtherParam string `json:"other_param"` // example value of other param
+}
+```
+
+#### dummy_two.go
+```go
+package example
+
+type DummyTwo struct {
+	Included
+	SomeParam     string      `json:"some_param"`    // example value of param
+	OptionalParam *string     `json:"some_param"`    // any pointer param will be optional
+	IntParam      int         `json:"int_param"`     // 10
+	NestedParam   Nested      `json:"nested_param"`  //
+	NestedParams  []Nested    `json:"nested_params"` //
+	Anything      interface{} `json:"anything"`      // example enum (any value)
 }
 ```
 
@@ -69,6 +87,15 @@ You can write any content here.
 
 ### Nested
 + other_param: `example value of other param` (string, required)
+
+### DummyTwo
++ Include Included
++ some_param: `example value of param` (string, required)
++ some_param: `any pointer param will be optional` (string, optional)
++ int_param: `10` (number, required)
++ nested_param (Nested, required)
++ nested_params (array[Nested], required)
++ anything: `example enum (any value)` (enum, required)
 
 ###### `# Generated docs end`
 ```
