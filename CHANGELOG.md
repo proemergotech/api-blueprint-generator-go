@@ -1,5 +1,8 @@
 # Release Notes
 
+## 0.1.2 / 2017-11-09
+- Fixed boolean parameter type name in generated docs (bool -> boolean)
+
 ## 0.1.1 / 2017-11-09
 - Added support for glob pattern for input files
 

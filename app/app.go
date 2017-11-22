@@ -102,7 +102,7 @@ func Run(sourcePathPattern string, targetPath string) {
 						case "string":
 							apiMdFile.WriteString("string")
 						case "bool":
-							apiMdFile.WriteString("bool")
+							apiMdFile.WriteString("boolean")
 						default:
 							apiMdFile.WriteString(fTypeName)
 						}
