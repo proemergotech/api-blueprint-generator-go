@@ -13,6 +13,7 @@ You can write any content here.
 + nested_param (Nested, required)
 + nested_params (array[Nested], required)
 + anything: `example enum (any value)` (enum, required)
++ InterfaceAsLast (enum, required)
 
 ### Included
 + included_param: `example value of included param` (string, required)

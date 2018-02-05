@@ -5,18 +5,19 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"regexp"
 	"path/filepath"
+	"regexp"
 )
 
 const start = "###### `# Generated docs start`"
 const end = "###### `# Generated docs end`"
 
 var (
+	ifaceRegex    = regexp.MustCompile(`interface\{\}`)
 	structRegex   = regexp.MustCompile(`(?m:^\s*type\s+(\S+)\s+struct\s*{(?s:(.*?))}\s*?$)`)
 	tags          = "`([^`]*)`"
 	fieldRegex    = regexp.MustCompile(`(?m:^\s*(\S+)(?:\s*$|\s*(\S+)\s*(?:$|` + tags + `\s*(?:$|//\s*?(\S.*?)?\s*$))))`)
-	typeRegex     = regexp.MustCompile(`^(\*?)((?:\[\])?)(?:(interface{})|(\S+))$`)
+	typeRegex     = regexp.MustCompile(`^(\*?)((?:\[\])?)(\S+)$`)
 	jsonTag       = regexp.MustCompile(`json:"(\w+)`)
 	numberPattern = regexp.MustCompile(`^u?(?:int|float)\d*$`)
 )
@@ -25,7 +26,7 @@ func Run(sourcePathPattern string, targetPath string) {
 	sourcePaths, err := filepath.Glob(sourcePathPattern)
 	check(err)
 
-	apiMdFile, err := os.OpenFile(targetPath, os.O_RDWR|os.O_CREATE,0666)
+	apiMdFile, err := os.OpenFile(targetPath, os.O_RDWR|os.O_CREATE, 0666)
 	check(err)
 	defer apiMdFile.Close()
 
@@ -39,7 +40,7 @@ func Run(sourcePathPattern string, targetPath string) {
 	if startIndex == -1 || endIndex < startIndex {
 		startIndex = len(origData)
 	} else {
-		tail = origData[endIndex + len(end):]
+		tail = origData[endIndex+len(end):]
 	}
 
 	err = apiMdFile.Truncate(int64(startIndex))
@@ -52,6 +53,8 @@ func Run(sourcePathPattern string, targetPath string) {
 	for _, sourcePath := range sourcePaths {
 		dat, err := ioutil.ReadFile(sourcePath)
 		check(err)
+
+		dat = ifaceRegex.ReplaceAll(dat, []byte("interface"))
 
 		for _, s := range structRegex.FindAllSubmatch(dat, -1) {
 			sName := string(s[1])
@@ -78,8 +81,8 @@ func Run(sourcePathPattern string, targetPath string) {
 
 					fOptional := len(typeMatches[1]) > 0
 					fSlice := len(typeMatches[2]) > 0
-					fInterface := len(typeMatches[3]) > 0
-					fTypeName := typeMatches[4]
+					fTypeName := typeMatches[3]
+					fInterface := fTypeName == "interface"
 
 					apiMdFile.WriteString("+ " + fName)
 
